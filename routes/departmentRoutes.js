@@ -18,7 +18,7 @@ router.post("/", async (req, res) => {
 
   try {
     const result = await pool.query(
-      `INSERT INTO departments (
+      `INSERT INTO department_form_submissions (
         first_name, last_name, email, phone,
         department, website_url, created_date, budget
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -36,7 +36,7 @@ router.post("/", async (req, res) => {
 // ✅ GET all departments
 router.get("/", async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM departments ORDER BY id DESC");
+    const result = await pool.query("SELECT * FROM department_form_submissions ORDER BY id DESC");
     res.json(result.rows);
   } catch (err) {
     console.error("❌ Error fetching departments:", err);
@@ -48,7 +48,7 @@ router.get("/", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    await pool.query("DELETE FROM departments WHERE id = $1", [id]);
+    await pool.query("DELETE FROM department_form_submissions WHERE id = $1", [id]);
     res.json({ message: "Department deleted successfully" });
   } catch (err) {
     console.error("❌ Delete error:", err);
@@ -72,7 +72,7 @@ router.put("/:id", async (req, res) => {
 
   try {
     const result = await pool.query(
-      `UPDATE departments SET
+      `UPDATE department_form_submissions SET
         first_name = $1,
         last_name = $2,
         email = $3,

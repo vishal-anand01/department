@@ -18,7 +18,7 @@ router.post("/", async (req, res) => {
 
   try {
     const result = await pool.query(
-      `INSERT INTO departments (
+      `INSERT INTO department_form_submissions (
         first_name, last_name, email, phone,
         department, website_url, created_date, budget
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -36,10 +36,10 @@ router.post("/", async (req, res) => {
 // ✅ GET all departments
 router.get("/", async (req, res) => {
   try {
-    const totalDepartments = await pool.query("SELECT COUNT(*) FROM departments");
-    const totalEmails = await pool.query("SELECT COUNT(DISTINCT email) FROM departments");
-    const totalWebsites = await pool.query("SELECT COUNT(DISTINCT website_url) FROM departments WHERE website_url IS NOT NULL AND website_url != ''");
-    const totalBudget = await pool.query("SELECT COALESCE(SUM(budget), 0) FROM departments");
+    const totalDepartments = await pool.query("SELECT COUNT(*) FROM department_form_submissions");
+    const totalEmails = await pool.query("SELECT COUNT(DISTINCT email) FROM department_form_submissions");
+    const totalWebsites = await pool.query("SELECT COUNT(DISTINCT website_url) FROM department_form_submissions WHERE website_url IS NOT NULL AND website_url != ''");
+    const totalBudget = await pool.query("SELECT COALESCE(SUM(budget), 0) FROM department_form_submissions");
 
     res.json({
       totalDepartments: parseInt(totalDepartments.rows[0].count),
@@ -57,7 +57,7 @@ router.get("/", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    await pool.query("DELETE FROM departments WHERE id = $1", [id]);
+    await pool.query("DELETE FROM department_form_submissions WHERE id = $1", [id]);
     res.json({ message: "Department deleted successfully" });
   } catch (err) {
     console.error("❌ Delete error:", err);
@@ -81,7 +81,7 @@ router.put("/:id", async (req, res) => {
 
   try {
     const result = await pool.query(
-      `UPDATE departments SET
+      `UPDATE department_form_submissions SET
         first_name = $1,
         last_name = $2,
         email = $3,

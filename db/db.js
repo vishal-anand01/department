@@ -1,4 +1,3 @@
-// backend/db/db.js
 import pkg from 'pg';
 import dotenv from 'dotenv';
 
@@ -11,6 +10,9 @@ const pool = new Pool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   database: process.env.DB_NAME,
+  ssl: {
+    rejectUnauthorized: false, // 👈 Important for Render.com
+  },
 });
 
 export default pool;
