@@ -102,8 +102,8 @@ router.get('/s3waas-lastupdated', async (req, res) => {
 
     for (const domain of domains) {
 
-      
-      const url = `https://department-zszg.onrender.com/api/v1/s3waas_lastupdated/1QD456R3-3H4C-7654-S09UKDEPT/${domain}`;
+      // const url = `https://api.s3waas.gov.in/api/v1/s3waas_lastupdated/1QD456R3-3H4C-7654-S09UKDEPT/${domain}`;
+      const url = `http://localhost:5000/api/v1/s3waas_lastupdated/1QD456R3-3H4C-7654-S09UKDEPT/${domain}`;
       const resp = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` }
       });
