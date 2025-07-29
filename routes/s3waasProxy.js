@@ -52,6 +52,7 @@ router.post("/s3waas-login", async (req, res) => {
 });
 
 // ✅ GET - Latest Updates API
+// ✅ GET - Latest Updates API (Always show all 66 domains)
 router.get("/s3waas-lastupdated", async (req, res) => {
   try {
     let token = req.query.token;
@@ -63,41 +64,55 @@ router.get("/s3waas-lastupdated", async (req, res) => {
     const result = [];
 
     for (const domain of DOMAIN_LIST) {
-      const url = `https://api.s3waas.gov.in/api/v1/s3waas_lastupdated/1QD456R3-3H4C-7654-S09UKDEPT/${domain}`;
-      const resp = await axios.get(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      try {
+        const url = `https://api.s3waas.gov.in/api/v1/s3waas_lastupdated/1QD456R3-3H4C-7654-S09UKDEPT/${domain}`;
+        const resp = await axios.get(url, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      const siteData = resp.data?.result?.[0];
-      const page = siteData?.data?.last_updated?.page;
+        const siteData = resp.data?.result?.[0];
+        const page = siteData?.data?.last_updated?.page;
 
-      if (page?.date) {
         const entry = {
-          site_title: siteData.site_title || domain,
-          siteurl: siteData.siteurl || domain,
-          data: siteData.data,
+          site_title: siteData?.site_title || domain,
+          siteurl: siteData?.siteurl || domain,
+          data: siteData?.data || {},
+          error: false,
         };
 
         await LastUpdated.findOneAndUpdate(
           { siteurl: entry.siteurl },
           {
             ...entry,
-            fetchedAt: new Date(),        // 🔄 still useful
-            lastUpdatedAt: new Date()     // ✅ new field
+            fetchedAt: new Date(),
+            lastUpdatedAt: new Date(),
           },
           { upsert: true, new: true }
         );
 
         result.push(entry);
+      } catch (err) {
+        // ⚠️ If error, still push entry with basic info
+        const fallbackEntry = {
+          site_title: domain,
+          siteurl: domain,
+          data: {},
+          error: true,
+        };
+
+        result.push(fallbackEntry);
+        console.warn(`⚠️ Failed to fetch ${domain}:`, err?.response?.data || err.message);
       }
     }
 
-    res.json({ result });
+    res.json(result); // Always send full result list
   } catch (err) {
     console.error("Update Fetch Error:", err?.response?.data || err.message);
     res.status(500).json({ message: "Fetch failed" });
   }
 });
+
+
 
 // ✅ GET - Mongo data only
 router.get("/mongo-latest", async (req, res) => {
