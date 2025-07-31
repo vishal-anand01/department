@@ -25,9 +25,8 @@ app.use("/api/departments", departmentRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/lastupdates", latestUpdateRoutes);
 
-// ✅ CRON - Every hour, calls existing route
-// 🔁 TESTING: Run every minute instead of every hour
-cron.schedule("* * * * *", async () => {
+// ✅ CRON - Every 5 hours, calls existing route
+cron.schedule("0 */5 * * *", async () => {
   try {
     console.log(`[${new Date().toLocaleTimeString()}] ⏳ CRON: Triggering /s3waas-lastupdated...`);
     await axios.get(`http://localhost:${PORT}/api/lastupdates/s3waas-lastupdated?token=auto`);
@@ -36,6 +35,7 @@ cron.schedule("* * * * *", async () => {
     console.error(`[${new Date().toLocaleTimeString()}] ❌ CRON failed:`, err.message);
   }
 });
+
 
 
 // ✅ Start Server
